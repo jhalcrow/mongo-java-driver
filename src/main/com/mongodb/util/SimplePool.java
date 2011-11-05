@@ -100,7 +100,7 @@ public abstract class SimplePool<T> implements DynamicMBean {
     }
 
     /** 
-     * call done when you are done with an object form the pool
+     * call done when you are done with an object from the pool
      * if there is room and the object is ok will get added
      * @param t Object to add
      */
@@ -140,6 +140,11 @@ public abstract class SimplePool<T> implements DynamicMBean {
         }
     }
 
+    /**
+     * Removes this object from the pool.
+     *
+     * @param t the object to remove
+     */
     public void remove( T t ){
         done( t , false );
     }

@@ -33,13 +33,18 @@ import javax.management.DynamicMBean;
 import javax.management.MBeanAttributeInfo;
 import javax.management.MBeanInfo;
 
+/**
+ * A pool of objects with checkout semantics.  It has the ability to optionally track leaked objects.
+ *
+ * @param <T>  The type object to pool.
+ */
 public abstract class SimplePool<T> implements DynamicMBean {
 
     static final boolean TRACK_LEAKS = Boolean.getBoolean( "MONGO-TRACKLEAKS" );
     static final long _sleepTime = 2;
     
     /** 
-     * See full constructor docs
+     * See full constructor docs.
      */
     public SimplePool( String name , int maxToKeep , int maxTotal ){
         this( name , maxToKeep , maxTotal , false , false );
@@ -57,7 +62,7 @@ public abstract class SimplePool<T> implements DynamicMBean {
         _maxTotal = maxTotal;
         _trackLeaks = trackLeaks || TRACK_LEAKS;
         _debug = debug;
-        _mbeanInfo = new MBeanInfo( this.getClass().getName() , _name , 
+        _mbeanInfo = new MBeanInfo( this.getClass().getName() , _name ,
                 new MBeanAttributeInfo[]{
                     new MBeanAttributeInfo( "name" , "java.lang.String" , "name of pool" , true , false , false ) , 
                     new MBeanAttributeInfo( "size" , "java.lang.Integer" , "total size of pool" , true , false , false ) , 

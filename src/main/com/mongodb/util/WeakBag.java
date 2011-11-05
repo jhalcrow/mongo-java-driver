@@ -26,7 +26,7 @@ import java.util.List;
 
 /**
  * if its not obvious what a weak bag should do, then, well...
- * very very not thead safe
+ * very very not thread safe.
  */
 public class WeakBag<T> implements Iterable<T> {
 

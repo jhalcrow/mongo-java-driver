@@ -27,17 +27,31 @@ import org.bson.BasicBSONDecoder;
 public class DefaultDBDecoder extends BasicBSONDecoder implements DBDecoder {
 
     static class DefaultFactory implements DBDecoderFactory {
-        @Override
         public DBDecoder create( ){
-            return new DefaultDBDecoder( );
+            return new DefaultDBDecoder(_mongoOptions);
         }
+
+        public DefaultFactory() {
+            _mongoOptions = new MongoOptions();
+        }
+
+        public DefaultFactory(MongoOptions mongoOptions ) {
+            _mongoOptions = mongoOptions;
+        }
+
+        private MongoOptions _mongoOptions;
     }
 
     public static DBDecoderFactory FACTORY = new DefaultFactory();
 
-    public DefaultDBDecoder( ){
+    public DefaultDBDecoder( ) {
+        this(new MongoOptions());
     }
-        
+
+    public DefaultDBDecoder(MongoOptions mongoOptions) {
+        super(mongoOptions.uuidRepresentation);
+    }
+
     public DBCallback getDBCallback(DBCollection collection) {
         // brand new callback every time
         return new DefaultDBCallback(collection);

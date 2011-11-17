@@ -18,6 +18,8 @@
 
 package com.mongodb;
 
+import org.bson.UUIDRepresentation;
+
 import javax.net.SocketFactory;
 
 /**
@@ -44,10 +46,11 @@ public class MongoOptions {
         wtimeout = 0;
         fsync = false;
         j = false;
-        dbDecoderFactory = DefaultDBDecoder.FACTORY;
-        dbEncoderFactory = DefaultDBEncoder.FACTORY;
         socketFactory = SocketFactory.getDefault();
         description = null;
+        uuidRepresentation = UUIDRepresentation.JAVA_LEGACY;
+        dbDecoderFactory = new DefaultDBDecoder.DefaultFactory(this);
+        dbEncoderFactory = new DefaultDBEncoder.DefaultFactory(this);
     }
 
     public MongoOptions copy() {
@@ -66,6 +69,7 @@ public class MongoOptions {
         m.wtimeout = wtimeout;
         m.fsync = fsync;
         m.j = j;
+        m.uuidRepresentation = uuidRepresentation;
         m.dbDecoderFactory = dbDecoderFactory;
         m.dbEncoderFactory = dbEncoderFactory;
         m.socketFactory = socketFactory;
@@ -216,6 +220,11 @@ public class MongoOptions {
      */
     public SocketFactory socketFactory;
 
+    /**
+     * The default UUID representation to use.
+     */
+    public UUIDRepresentation uuidRepresentation;
+
     public String toString(){
         StringBuilder buf = new StringBuilder();
         buf.append( "description=" ).append( description ).append( ", " );
@@ -232,8 +241,8 @@ public class MongoOptions {
         buf.append( "w=" ).append( w ).append( ", " );
         buf.append( "wtimeout=" ).append( wtimeout ).append( ", " );
         buf.append( "fsync=" ).append( fsync ).append( ", " );
-        buf.append( "j=" ).append( j );
-
+        buf.append( "j=" ).append( j ).append( ", " );
+        buf.append( "uuidRepresentation=" ).append(uuidRepresentation);
         return buf.toString();
     }
 

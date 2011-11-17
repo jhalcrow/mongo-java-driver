@@ -78,7 +78,15 @@ public class BasicBSONEncoder implements BSONEncoder {
     static final boolean DEBUG = false;
 
     public BasicBSONEncoder(){
+        this(UUIDRepresentation.JAVA_LEGACY);
+    }
 
+    public BasicBSONEncoder(UUIDRepresentation uuidRepresentation) {
+        this._uuidRepresentation = uuidRepresentation;
+    }
+
+    public UUIDRepresentation getUuidRepresentation() {
+        return _uuidRepresentation;
     }
 
     public byte[] encode( BSONObject o ){
@@ -219,25 +227,25 @@ public class BasicBSONEncoder implements BSONEncoder {
         else if ( val instanceof Character )
             putString(name, val.toString() );
         else if ( val instanceof String )
-            putString(name, val.toString() );
+            putString(name, val.toString());
         else if ( val instanceof ObjectId )
-            putObjectId(name, (ObjectId)val );
+            putObjectId(name, (ObjectId) val);
         else if ( val instanceof BSONObject )
-            putObject(name, (BSONObject)val );
+            putObject(name, (BSONObject) val);
         else if ( val instanceof Boolean )
-            putBoolean(name, (Boolean)val );
+            putBoolean(name, (Boolean) val);
         else if ( val instanceof Pattern )
-            putPattern(name, (Pattern)val );
+            putPattern(name, (Pattern) val);
         else if ( val instanceof Map )
-            putMap( name , (Map)val );
+            putMap(name, (Map) val);
         else if ( val instanceof Iterable)
-            putIterable( name , (Iterable)val );
+            putIterable(name, (Iterable) val);
         else if ( val instanceof byte[] )
             putBinary( name , (byte[])val );
         else if ( val instanceof Binary )
-            putBinary( name , (Binary)val );
+            putBinary(name, (Binary) val);
         else if ( val instanceof UUID )
-            putUUID( name , (UUID)val );
+            putUUID(name, (UUID) val);
         else if ( val.getClass().isArray() )
         	putArray( name , val );
 
@@ -245,13 +253,13 @@ public class BasicBSONEncoder implements BSONEncoder {
             putSymbol(name, (Symbol) val);
         }
         else if (val instanceof BSONTimestamp) {
-            putTimestamp( name , (BSONTimestamp)val );
+            putTimestamp(name, (BSONTimestamp) val);
         }
         else if (val instanceof CodeWScope) {
-            putCodeWScope( name , (CodeWScope)val );
+            putCodeWScope(name, (CodeWScope) val);
         }
         else if (val instanceof Code) {
-            putCode( name , (Code)val );
+            putCode(name, (Code) val);
         }
         else if (val instanceof DBRefBase) {
             BSONObject temp = new BasicBSONObject();
@@ -260,7 +268,7 @@ public class BasicBSONEncoder implements BSONEncoder {
             putObject( name, temp );
         }
         else if ( val instanceof MinKey )
-            putMinKey( name );
+            putMinKey(name);
         else if ( val instanceof MaxKey )
             putMaxKey( name );
         else if ( putSpecial( name , val ) ){
@@ -402,9 +410,8 @@ public class BasicBSONEncoder implements BSONEncoder {
     protected void putUUID( String name , UUID val ){
         _put( BINARY , name );
         _buf.writeInt( 16 );
-        _buf.write( B_UUID );
-        _buf.writeLong( val.getMostSignificantBits());
-        _buf.writeLong( val.getLeastSignificantBits());
+        _buf.write( _uuidRepresentation.getSubType() );
+        _buf.write( _uuidRepresentation.toBytes(val) );
     }
 
     protected void putSymbol( String name , Symbol s ){
@@ -522,4 +529,5 @@ public class BasicBSONEncoder implements BSONEncoder {
 
     protected OutputBuffer _buf;
 
+    protected final UUIDRepresentation _uuidRepresentation;
 }

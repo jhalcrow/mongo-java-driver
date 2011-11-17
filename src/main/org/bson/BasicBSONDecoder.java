@@ -18,6 +18,7 @@ package org.bson;
 import static org.bson.BSON.*;
 
 import java.io.*;
+import java.util.UUID;
 
 import org.bson.io.BSONInput;
 import org.bson.io.PoolOutputBuffer;
@@ -28,6 +29,18 @@ import org.bson.types.ObjectId;
  * Basic implementation of BSONDecoder interface that creates BasicBSONObject instances
  */
 public class BasicBSONDecoder implements BSONDecoder {
+    public BasicBSONDecoder() {
+        this(UUIDRepresentation.JAVA_LEGACY);
+    }
+
+    public BasicBSONDecoder(UUIDRepresentation uuidRepresentation) {
+        _uuidRepresentation = uuidRepresentation;
+    }
+
+    public UUIDRepresentation getUuidRepresentation() {
+        return _uuidRepresentation;
+    }
+
     public BSONObject readObject( byte[] b ){
         try {
             return readObject( new ByteArrayInputStream( b ) );
@@ -242,7 +255,7 @@ public class BasicBSONDecoder implements BSONDecoder {
                 _callback.gotBinary( name, bType, data );
                 return;
         }
-        case B_BINARY:
+        case B_BINARY: {
             final int len = _in.readInt();
             if ( len + 4 != totalLen )
                 throw new IllegalArgumentException( "bad data size subtype 2 len: " + len + " totalLen: " + totalLen );
@@ -251,14 +264,17 @@ public class BasicBSONDecoder implements BSONDecoder {
             _in.fill( data );
             _callback.gotBinary( name , bType , data );
             return;
-        case B_UUID:
-            if ( totalLen != 16 )
-                throw new IllegalArgumentException( "bad data size subtype 3 len: " + totalLen + " != 16");
-
-            long part1 = _in.readLong();
-            long part2 = _in.readLong();
-            _callback.gotUUID(name, part1, part2);
+        }
+        case B_UUID_LEGACY:
+        case B_UUID_STANDARD: {
+            if (totalLen != 16)
+                throw new IllegalArgumentException("bad data size for UUID, len: " + totalLen + " != 16");
+            final byte[] data = new byte[totalLen];
+            _in.fill(data);
+            UUID uuid = _uuidRepresentation.fromBytes( data );
+            _callback.gotUUID(name, uuid.getMostSignificantBits(), uuid.getLeastSignificantBits());
             return;
+        }
         }
 
         byte[] data = new byte[totalLen];
@@ -285,5 +301,5 @@ public class BasicBSONDecoder implements BSONDecoder {
 
     protected BSONInput _in;
     protected BSONCallback _callback;
-
+    protected final UUIDRepresentation _uuidRepresentation;
 }

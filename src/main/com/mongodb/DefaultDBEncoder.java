@@ -22,18 +22,37 @@ import org.bson.types.*;
 
 public class DefaultDBEncoder extends BasicBSONEncoder implements DBEncoder {
 
+    static class DefaultFactory implements DBEncoderFactory {
+        public DBEncoder create( ){
+            return new DefaultDBEncoder(_mongoOptions);
+        }
+
+        public DefaultFactory( ) {
+            _mongoOptions = new MongoOptions();
+        }
+
+        public DefaultFactory(MongoOptions mongoOptions ) {
+            _mongoOptions = mongoOptions;
+        }
+
+        private MongoOptions _mongoOptions;
+
+    }
+
+
+    public DefaultDBEncoder( ){
+        this(new MongoOptions());
+    }
+
+    public DefaultDBEncoder(MongoOptions mongoOptions) {
+        super(mongoOptions.uuidRepresentation);
+    }
+
     public int writeObject( OutputBuffer buf, BSONObject o ){
         set( buf );
         int x = super.putObject( o );
         done();
         return x;
-    }
-
-    static class DefaultFactory implements DBEncoderFactory {
-        @Override
-        public DBEncoder create( ){
-            return new DefaultDBEncoder( );
-        }
     }
 
     @SuppressWarnings("deprecation")
@@ -75,8 +94,5 @@ public class DefaultDBEncoder extends BasicBSONEncoder implements DBEncoder {
 
 
     public static DBEncoderFactory FACTORY = new DefaultFactory();
-
-    public DefaultDBEncoder( ){
-    }
 
 }

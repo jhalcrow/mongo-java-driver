@@ -21,6 +21,7 @@ package com.mongodb;
 import java.util.*;
 
 import com.mongodb.DBApiLayer.Result;
+import org.bson.DBEncoderDecoderOptions;
 
 
 /** An iterator over database results.
@@ -366,7 +367,8 @@ public class DBCursor implements Iterator<DBObject> , Iterable<DBObject> {
                     foo.put( "$snapshot", true );
             }
 
-            _it = _collection.__find( foo, _keysWanted, _skip, _batchSize, _limit , _options , _readPref , _decoderFact.create() );
+            _it = _collection.__find( foo, _keysWanted, _skip, _batchSize, _limit , _options , _readPref ,
+                    _decoderFact.create( DBEncoderDecoderOptions.getDefault() ) );
         }
 
         if ( _it == null ){

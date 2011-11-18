@@ -1,20 +1,20 @@
-// UUIDRepresentationTest.java
-
-/**
- *      Copyright (C) 2008 10gen Inc.
+/*
+ * Copyright (C) 2011 10gen Inc.
  *
- *   Licensed under the Apache License, Version 2.0 (the "License");
- *   you may not use this file except in compliance with the License.
- *   You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *  http://www.apache.org/licenses/LICENSE-2.0
  *
- *   Unless required by applicable law or agreed to in writing, software
- *   distributed under the License is distributed on an "AS IS" BASIS,
- *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *   See the License for the specific language governing permissions and
- *   limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
+
+// UUIDRepresentationTest.java
 package org.bson;
 
 import org.testng.Assert;
@@ -25,6 +25,14 @@ import java.util.UUID;
 import static org.bson.UUIDRepresentation.*;
 
 public class UUIDRepresentationTest extends Assert {
+    @Test
+    public void testSubTypes() {
+        Assert.assertEquals( JAVA_LEGACY.getSubType(), 3);
+        Assert.assertEquals( PYTHON_LEGACY.getSubType(), 3);
+        Assert.assertEquals( C_SHARP_LEGACY.getSubType(), 3);
+        Assert.assertEquals( STANDARD.getSubType(), 4);
+    }
+
     @Test
     public void testJavaLegacyEncoding() {
         UUID uuid = UUID.fromString("01020304-0506-0708-090a-0b0c0d0e0f10");

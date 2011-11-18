@@ -16,10 +16,9 @@
 
 package com.mongodb;
 
+import org.bson.UUIDRepresentation;
 import java.net.UnknownHostException;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.logging.Logger;
 
 /**
@@ -154,17 +153,42 @@ public class MongoURI {
                 else if ( key.equals( "w" ) ) _options.w = Integer.parseInt( value );
                 else if ( key.equals( "wtimeout" ) ) _options.wtimeout = Integer.parseInt( value );
                 else if ( key.equals( "fsync" ) ) _options.fsync = _parseBoolean( value );
-                else LOGGER.warning( "Unknown or Unsupported Option '" + value + "'" );
+                else if ( key.equals( "guids" ) )  _options.uuidRepresentation = _parseGuids( value );
+                else LOGGER.warning( "Unknown or Unsupported Option '" + key + "'" );
             }
         }
     }
 
-    boolean _parseBoolean( String _in ){
+    static boolean _parseBoolean( String _in ){
         String in = _in.trim();
         if ( in != null && in.length() > 0 && ( in.equals( "1" ) || in.toLowerCase().equals( "true" ) || in.toLowerCase()
                                                                                                          .equals( "yes" ) ) )
             return true;
         else return false;
+    }
+
+
+
+    private static Map<String, UUIDRepresentation> uriValueMap = new HashMap<String, UUIDRepresentation>();
+
+    static {
+        uriValueMap.put( "standard", UUIDRepresentation.STANDARD );
+        uriValueMap.put( "javalegacy", UUIDRepresentation.JAVA_LEGACY );
+        uriValueMap.put( "pythonlegacy", UUIDRepresentation.PYTHON_LEGACY );
+        uriValueMap.put( "csharplegacy", UUIDRepresentation.C_SHARP_LEGACY );
+    }
+
+    /**
+     * Return the UUIDRepresentation for the given URI value taken from the mongo URI
+     * @param uriValue the uriValue (which will be lower-cased before comparison)
+     */
+    static UUIDRepresentation _parseGuids(String uriValue) {
+        UUIDRepresentation retVal =  uriValueMap.get( uriValue.toLowerCase() );
+        if (retVal == null) {
+            throw new IllegalArgumentException( "Unsupported value for 'guids' of '" + uriValue + "'" );
+        }
+
+        return retVal;
     }
 
     // ---------------------------------

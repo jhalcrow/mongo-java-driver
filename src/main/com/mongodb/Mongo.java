@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import org.bson.UUIDRepresentation;
 import org.bson.io.PoolOutputBuffer;
 
 /**
@@ -482,6 +483,29 @@ public class Mongo {
     }
 
     /**
+     * Sets the UUIDRepresentation for all databases in this mongo. Will be used as default
+     * for reads and writes to and from all databases in this mongo; overrides default setting or setting from
+     * MongoURI.
+     * See the documentation for {@link UUIDRepresentation} for more information.
+     *
+     * @param uuidRepresentation UUID representation to use
+     */
+    public void setUUIDRepresentation( UUIDRepresentation uuidRepresentation){
+        _uuidRepresentation = uuidRepresentation;
+    }
+
+    /**
+     * Gets the UUID representation
+     * @return
+     */
+    public UUIDRepresentation getUUIDRepresentation(){
+        if ( _uuidRepresentation != null )
+            return _uuidRepresentation;
+        return _options.uuidRepresentation;
+    }
+
+
+    /**
      * adds a default query option
      * @param option
      */
@@ -549,6 +573,7 @@ public class Mongo {
     final ConcurrentMap<String,DB> _dbs = new ConcurrentHashMap<String,DB>();
     private WriteConcern _concern = WriteConcern.NORMAL;
     private ReadPreference _readPref = ReadPreference.PRIMARY;
+    private UUIDRepresentation _uuidRepresentation;
     final Bytes.OptionHolder _netOptions = new Bytes.OptionHolder( null );
     final DBCleanerThread _cleaner;
 
@@ -610,6 +635,7 @@ public class Mongo {
         }
         return false;
     }
+
 
     // -------
 

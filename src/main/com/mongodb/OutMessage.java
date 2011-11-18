@@ -24,6 +24,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.bson.BSONObject;
 import org.bson.BasicBSONEncoder;
+import org.bson.DBEncoderDecoderOptions;
 import org.bson.io.PoolOutputBuffer;
 
 class OutMessage extends BasicBSONEncoder {
@@ -35,7 +36,8 @@ class OutMessage extends BasicBSONEncoder {
     }
 
     static OutMessage query( Mongo m , int options , String ns , int numToSkip , int batchSize , DBObject query , DBObject fields, ReadPreference readPref ){
-        return query( m, options, ns, numToSkip, batchSize, query, fields, readPref, DefaultDBEncoder.FACTORY.create());
+        return query( m, options, ns, numToSkip, batchSize, query, fields, readPref,
+                DefaultDBEncoder.FACTORY.create(DBEncoderDecoderOptions.getDefault() ));
     }
 
     static OutMessage query( Mongo m , int options , String ns , int numToSkip , int batchSize , DBObject query , DBObject fields, ReadPreference readPref, DBEncoder enc ){
@@ -47,7 +49,7 @@ class OutMessage extends BasicBSONEncoder {
     }
 
     OutMessage( Mongo m ){
-        this( m , DefaultDBEncoder.FACTORY.create() );
+        this( m , DefaultDBEncoder.FACTORY.create( DBEncoderDecoderOptions.getDefault()) );
     }
 
     OutMessage( Mongo m , int op ){
@@ -102,7 +104,7 @@ class OutMessage extends BasicBSONEncoder {
     }
 
     void prepare(){
-        _buffer.writeInt( 0 , _buffer.size() );
+        _buffer.writeInt( 0, _buffer.size() );
     }
 
 

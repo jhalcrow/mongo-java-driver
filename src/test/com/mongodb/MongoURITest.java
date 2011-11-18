@@ -22,6 +22,7 @@ import java.util.*;
 import java.util.regex.*;
 import java.io.IOException;
 
+import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import com.mongodb.util.*;
@@ -36,7 +37,7 @@ public class MongoURITest extends TestCase {
     public void testBasic1(){
         MongoURI u = new MongoURI( "mongodb://foo/bar" );
         assertEquals( 1 , u.getHosts().size() );
-        assertEquals( "foo" , u.getHosts().get(0) );
+        assertEquals( "foo" , u.getHosts().get( 0 ) );
         assertEquals( "bar" , u.getDatabase() );
         assertEquals( null , u.getCollection() );
         assertEquals( null , u.getUsername() );
@@ -87,19 +88,36 @@ public class MongoURITest extends TestCase {
         MongoURI uAmp = new MongoURI( "mongodb://localhost/test?" +
                         "maxPoolSize=10&waitQueueMultiple=5&waitQueueTimeoutMS=150&" +
                         "connectTimeoutMS=2500&socketTimeoutMS=5500&autoConnectRetry=true&" +
-                        "slaveOk=true&safe=false&w=1&wtimeout=2500&fsync=true");
+                        "slaveOk=true&safe=false&w=1&wtimeout=2500&fsync=true&guids=STANDARD");
         _testOpts( uAmp._options );
         MongoURI uSemi = new MongoURI( "mongodb://localhost/test?" +
                 "maxPoolSize=10;waitQueueMultiple=5;waitQueueTimeoutMS=150;" +
                 "connectTimeoutMS=2500;socketTimeoutMS=5500;autoConnectRetry=true;" +
-                "slaveOk=true;safe=false;w=1;wtimeout=2500;fsync=true");
+                "slaveOk=true;safe=false;w=1;wtimeout=2500;fsync=true;guids=standard");
         _testOpts( uSemi._options );
         MongoURI uMixed = new MongoURI( "mongodb://localhost/test?" +
                 "maxPoolSize=10&waitQueueMultiple=5;waitQueueTimeoutMS=150;" +
                 "connectTimeoutMS=2500;socketTimeoutMS=5500&autoConnectRetry=true;" +
-                "slaveOk=true;safe=false&w=1;wtimeout=2500;fsync=true");
+                "slaveOk=true;safe=false&w=1;wtimeout=2500;fsync=true&guids=Standard");
         _testOpts( uMixed._options );
     }
+
+    @Test
+    public void testURIValues() {
+        Assert.assertEquals( MongoURI._parseGuids( "standard" ), UUIDRepresentation.STANDARD );
+        Assert.assertEquals( MongoURI._parseGuids( "Standard" ), UUIDRepresentation.STANDARD );
+        Assert.assertEquals( MongoURI._parseGuids( "STANDARD" ), UUIDRepresentation.STANDARD );
+        Assert.assertEquals( MongoURI._parseGuids( "javalegacy" ), UUIDRepresentation.JAVA_LEGACY );
+        Assert.assertEquals( MongoURI._parseGuids( "pythonlegacy" ), UUIDRepresentation.PYTHON_LEGACY );
+        Assert.assertEquals( MongoURI._parseGuids( "csharplegacy" ), UUIDRepresentation.C_SHARP_LEGACY );
+        try {
+            MongoURI._parseGuids( "unknown" );
+            Assert.fail();
+        } catch (IllegalArgumentException e) {
+
+        }
+    }
+
 
     @SuppressWarnings("deprecation")
     private void _testOpts(MongoOptions uOpt){
@@ -114,6 +132,7 @@ public class MongoURITest extends TestCase {
         assertEquals( uOpt.wtimeout, 2500 );
         assertTrue( uOpt.fsync );
         assertEquals( uOpt.getWriteConcern(), new WriteConcern(1, 2500, true) );
+        assertEquals( uOpt.uuidRepresentation, UUIDRepresentation.STANDARD );
     }
     public static void main( String args[] )
         throws Exception {

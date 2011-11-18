@@ -18,6 +18,7 @@ package com.mongodb;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.bson.DBEncoderDecoderOptions;
 import org.bson.LazyBSONDecoder;
 
 /**
@@ -26,7 +27,8 @@ import org.bson.LazyBSONDecoder;
 public class LazyDBDecoder extends LazyBSONDecoder implements DBDecoder {
     static class LazyDBDecoderFactory implements DBDecoderFactory {
         @Override
-        public DBDecoder create( ){
+        // TODO: Ignoring options for now
+        public DBDecoder create( DBEncoderDecoderOptions options ){
             return new LazyDBDecoder();
         }
     }

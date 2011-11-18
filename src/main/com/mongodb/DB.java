@@ -30,6 +30,8 @@ import java.util.Set;
 
 import com.mongodb.DBApiLayer.Result;
 import com.mongodb.util.Util;
+import org.bson.DBEncoderDecoderOptions;
+import org.bson.UUIDRepresentation;
 
 /**
  * an abstract class that represents a logical database on a server
@@ -157,7 +159,8 @@ public abstract class DB {
     public CommandResult command( DBObject cmd , int options, ReadPreference readPrefs )
         throws MongoException {
 
-        Iterator<DBObject> i = getCollection("$cmd").__find(cmd, new BasicDBObject(), 0, -1, 0, options, readPrefs , DefaultDBDecoder.FACTORY.create());
+        Iterator<DBObject> i = getCollection("$cmd").__find(cmd, new BasicDBObject(), 0, -1, 0, options, readPrefs ,
+                DefaultDBDecoder.FACTORY.create(new DBEncoderDecoderOptions( getUUIDRepresentation() )));
         if ( i == null || ! i.hasNext() )
             return null;
 
@@ -668,6 +671,27 @@ public abstract class DB {
     }
 
     /**
+     * Sets the UUIDRepresentation for this database. Will be used as default
+     * for reads and writes to and from all collections in this database; overrides DB level settings.
+     * See the documentation for {@link UUIDRepresentation} for more information.
+     *
+     * @param uuidRepresentation UUID representation to use
+     */
+    public void setUUIDRepresentation( UUIDRepresentation uuidRepresentation){
+        _uuidRepresentation = uuidRepresentation;
+    }
+
+    /**
+     * Gets the UUID representation
+     * @return
+     */
+    public UUIDRepresentation getUUIDRepresentation(){
+        if ( _uuidRepresentation != null )
+            return _uuidRepresentation;
+        return _mongo.getUUIDRepresentation();
+    }
+
+    /**
      * Adds the give option
      * @param option
      */
@@ -707,6 +731,7 @@ public abstract class DB {
     protected boolean _readOnly = false;
     private com.mongodb.WriteConcern _concern;
     private com.mongodb.ReadPreference _readPref;
+    private UUIDRepresentation _uuidRepresentation;
     final Bytes.OptionHolder _options;
 
     String _username;

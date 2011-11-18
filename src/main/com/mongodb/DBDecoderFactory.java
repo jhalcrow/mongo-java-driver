@@ -15,11 +15,18 @@
  */
 package com.mongodb;
 
+import org.bson.DBEncoderDecoderOptions;
+
 /**
  *
  */
 public interface DBDecoderFactory {
 
-    public DBDecoder create( );
+    /**
+     * NOTE: THIS IS A NON-BACKWARDS COMPATIBLE CHANGE!!!
+     * @param options encoder/decoder options
+     * @return the decoder
+     */
+    public DBDecoder create( DBEncoderDecoderOptions options );
     
 }

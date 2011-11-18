@@ -28,6 +28,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.bson.DBEncoderDecoderOptions;
+import org.bson.UUIDRepresentation;
 import org.bson.types.ObjectId;
 
 /** This class provides a skeleton implementation of a database collection.
@@ -54,7 +56,7 @@ public abstract class DBCollection {
      * @dochub insert
      */
     public WriteResult insert(DBObject[] arr , WriteConcern concern ) throws MongoException {
-        return insert( arr, concern, getDBEncoderFactory().create() );
+        return insert( arr, concern, getDBEncoderFactory().create( new DBEncoderDecoderOptions( getUUIDRepresentation() )));
     }
 
     /**
@@ -162,7 +164,8 @@ public abstract class DBCollection {
      * @dochub update
      */
     public WriteResult update( DBObject q , DBObject o , boolean upsert , boolean multi , WriteConcern concern ) throws MongoException {
-        return update( q, o, upsert, multi, concern, getDBEncoderFactory().create() );
+        return update( q, o, upsert, multi, concern,
+                getDBEncoderFactory().create( new DBEncoderDecoderOptions( getUUIDRepresentation() )));
     }
 
     /**
@@ -236,7 +239,7 @@ public abstract class DBCollection {
      * @dochub remove
      */
     public WriteResult remove( DBObject o , WriteConcern concern ) throws MongoException {
-        return remove(  o, concern, getDBEncoderFactory().create() );
+        return remove(  o, concern, getDBEncoderFactory().create( new DBEncoderDecoderOptions( getUUIDRepresentation() )));
     }
 
     /**
@@ -329,7 +332,8 @@ public abstract class DBCollection {
      * @dochub find
      */
     public final DBObject findOne( Object obj, DBObject fields ) {
-        Iterator<DBObject> iterator = __find(new BasicDBObject("_id", obj), fields, 0, -1, 0, getOptions(), getReadPreference(), _decoderFactory.create() );
+        Iterator<DBObject> iterator = __find(new BasicDBObject("_id", obj), fields, 0, -1, 0, getOptions(), getReadPreference(),
+                _decoderFactory.create(new DBEncoderDecoderOptions( getUUIDRepresentation() )) );
         return (iterator != null ? iterator.next() : null);
     }
 
@@ -433,7 +437,7 @@ public abstract class DBCollection {
      * @throws MongoException
      */
     public void createIndex( DBObject keys , DBObject options ) throws MongoException {
-        createIndex( keys, options, getDBEncoderFactory().create() );
+        createIndex( keys, options, getDBEncoderFactory().create(new DBEncoderDecoderOptions( getUUIDRepresentation() )));
     }
 
     /**
@@ -644,7 +648,8 @@ public abstract class DBCollection {
      * @dochub find
      */
     public final DBObject findOne( DBObject o, DBObject fields, ReadPreference readPref ) {
-        Iterator<DBObject> i = __find( o , fields , 0 , -1 , 0, getOptions(), readPref, _decoderFactory.create() );
+        Iterator<DBObject> i = __find( o , fields , 0 , -1 , 0, getOptions(), readPref,
+                _decoderFactory.create(new DBEncoderDecoderOptions( getUUIDRepresentation() )) );
         DBObject obj = (i == null ? null : i.next());
         if ( obj != null && ( fields != null && fields.keySet().size() > 0 ) ){
             obj.markAsPartialObject();
@@ -1385,6 +1390,27 @@ public abstract class DBCollection {
     }
 
     /**
+     * Sets the UUIDRepresentation for this collection. Will be used as default
+     * for reads and writes to and from this collection; overrides DB & Connection level settings.
+     * See the documentation for {@link UUIDRepresentation} for more information.
+     *
+     * @param uuidRepresentation UUID representation to use
+     */
+    public void setUUIDRepresentation( UUIDRepresentation uuidRepresentation){
+        _uuidRepresentation = uuidRepresentation;
+    }
+
+    /**
+     * Gets the UUID representation
+     * @return
+     */
+    public UUIDRepresentation getUUIDRepresentation(){
+        if ( _uuidRepresentation != null )
+            return _uuidRepresentation;
+        return _db.getUUIDRepresentation();
+    }
+
+    /**
      * adds a default query option
      * @param option
      */
@@ -1445,6 +1471,7 @@ public abstract class DBCollection {
     protected List<DBObject> _hintFields;
     private WriteConcern _concern = null;
     private ReadPreference _readPref = null;
+    private UUIDRepresentation _uuidRepresentation;
     private DBDecoderFactory _decoderFactory;
     private DBEncoderFactory _encoderFactory;
     final Bytes.OptionHolder _options;

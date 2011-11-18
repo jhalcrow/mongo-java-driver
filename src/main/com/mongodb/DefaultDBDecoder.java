@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.bson.BasicBSONDecoder;
+import org.bson.DBEncoderDecoderOptions;
 
 /**
  *
@@ -27,29 +28,19 @@ import org.bson.BasicBSONDecoder;
 public class DefaultDBDecoder extends BasicBSONDecoder implements DBDecoder {
 
     static class DefaultFactory implements DBDecoderFactory {
-        public DBDecoder create( ){
-            return new DefaultDBDecoder(_mongoOptions);
+        public DBDecoder create(DBEncoderDecoderOptions options) {
+            return new DefaultDBDecoder( options );
         }
-
-        public DefaultFactory() {
-            _mongoOptions = new MongoOptions();
-        }
-
-        public DefaultFactory(MongoOptions mongoOptions ) {
-            _mongoOptions = mongoOptions;
-        }
-
-        private MongoOptions _mongoOptions;
     }
 
     public static DBDecoderFactory FACTORY = new DefaultFactory();
 
     public DefaultDBDecoder( ) {
-        this(new MongoOptions());
+        this(DBEncoderDecoderOptions.getDefault());
     }
 
-    public DefaultDBDecoder(MongoOptions mongoOptions) {
-        super(mongoOptions.uuidRepresentation);
+    public DefaultDBDecoder(DBEncoderDecoderOptions options) {
+        super(options);
     }
 
     public DBCallback getDBCallback(DBCollection collection) {

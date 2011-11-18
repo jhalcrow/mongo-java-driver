@@ -32,6 +32,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.bson.BSONObject;
+import org.bson.DBEncoderDecoderOptions;
 import org.bson.types.ObjectId;
 
 import com.mongodb.util.JSON;
@@ -215,7 +216,7 @@ public class DBApiLayer extends DB {
             throws MongoException {
 
             if (encoder == null)
-                encoder = DefaultDBEncoder.FACTORY.create();
+                encoder = DefaultDBEncoder.FACTORY.create( new DBEncoderDecoderOptions( getUUIDRepresentation() ));
 
             if ( willTrace() ) {
                 for (DBObject o : arr) {
@@ -268,7 +269,7 @@ public class DBApiLayer extends DB {
             throws MongoException {
 
             if (encoder == null)
-                encoder = DefaultDBEncoder.FACTORY.create();
+                encoder = DefaultDBEncoder.FACTORY.create( new DBEncoderDecoderOptions( getUUIDRepresentation() ));
 
             if ( willTrace() ) trace( "remove: " + _fullNameSpace + " " + JSON.serialize( o ) );
 
@@ -322,7 +323,7 @@ public class DBApiLayer extends DB {
             throws MongoException {
 
             if (encoder == null)
-                encoder = DefaultDBEncoder.FACTORY.create();
+                encoder = DefaultDBEncoder.FACTORY.create( new DBEncoderDecoderOptions( getUUIDRepresentation() ));
 
             if (o != null && !o.keySet().isEmpty()) {
                 // if 1st key doesn't start with $, then object will be inserted as is, need to check it
@@ -352,7 +353,7 @@ public class DBApiLayer extends DB {
             throws MongoException {
 
             if (encoder == null)
-                encoder = DefaultDBEncoder.FACTORY.create();
+                encoder = DefaultDBEncoder.FACTORY.create(new DBEncoderDecoderOptions( getUUIDRepresentation() ));
 
             DBObject full = new BasicDBObject();
             for ( String k : options.keySet() )

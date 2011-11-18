@@ -13,27 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.mongodb;
 
+package org.bson;
 
-import org.bson.DBEncoderDecoderOptions;
+import org.bson.UUIDRepresentation;
 
 /**
- *
+ *  Options needed to control behavior of DBEncoder and DBDecoder implementations.
  */
-public class LazyWriteableDBDecoder extends LazyDBDecoder {
-    static class LazyDBDecoderFactory implements DBDecoderFactory {
-        @Override
-        // TODO: Ignoring encoder/decoder options for now
-        public DBDecoder create( DBEncoderDecoderOptions options){
-            return new LazyWriteableDBDecoder();
-        }
+public class DBEncoderDecoderOptions {
+
+    public DBEncoderDecoderOptions(UUIDRepresentation uuidRepresentation) {
+        this.uuidRepresentation = uuidRepresentation;
     }
 
-    public static DBDecoderFactory FACTORY = new LazyDBDecoderFactory();
-
-    public DBCallback getDBCallback(DBCollection collection) {
-        return new LazyWriteableDBCallback(collection);
+    public UUIDRepresentation getUuidRepresentation() {
+        return uuidRepresentation;
     }
 
+    private final UUIDRepresentation uuidRepresentation;
+
+    public static DBEncoderDecoderOptions getDefault() {
+        return new DBEncoderDecoderOptions(UUIDRepresentation.getDefault());
+    }
 }

@@ -30,15 +30,15 @@ import org.bson.types.ObjectId;
  */
 public class BasicBSONDecoder implements BSONDecoder {
     public BasicBSONDecoder() {
-        this(UUIDRepresentation.JAVA_LEGACY);
+        this(DBEncoderDecoderOptions.getDefault());
     }
 
-    public BasicBSONDecoder(UUIDRepresentation uuidRepresentation) {
-        _uuidRepresentation = uuidRepresentation;
+    public BasicBSONDecoder(DBEncoderDecoderOptions options) {
+        _options = options;
     }
 
-    public UUIDRepresentation getUuidRepresentation() {
-        return _uuidRepresentation;
+    public DBEncoderDecoderOptions getOptions() {
+        return _options;
     }
 
     public BSONObject readObject( byte[] b ){
@@ -271,7 +271,7 @@ public class BasicBSONDecoder implements BSONDecoder {
                 throw new IllegalArgumentException("bad data size for UUID, len: " + totalLen + " != 16");
             final byte[] data = new byte[totalLen];
             _in.fill(data);
-            UUID uuid = _uuidRepresentation.fromBytes( data );
+            UUID uuid = _options.getUuidRepresentation().fromBytes( data );
             _callback.gotUUID(name, uuid.getMostSignificantBits(), uuid.getLeastSignificantBits());
             return;
         }
@@ -301,5 +301,5 @@ public class BasicBSONDecoder implements BSONDecoder {
 
     protected BSONInput _in;
     protected BSONCallback _callback;
-    protected final UUIDRepresentation _uuidRepresentation;
+    protected final DBEncoderDecoderOptions _options;
 }

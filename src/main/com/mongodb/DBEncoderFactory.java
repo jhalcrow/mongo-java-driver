@@ -15,11 +15,13 @@
  */
 package com.mongodb;
 
+import org.bson.DBEncoderDecoderOptions;
+
 /**
  *
  */
 public interface DBEncoderFactory {
 
-    public DBEncoder create();
+    public DBEncoder create( DBEncoderDecoderOptions options);
     
 }

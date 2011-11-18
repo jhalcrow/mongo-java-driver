@@ -78,15 +78,15 @@ public class BasicBSONEncoder implements BSONEncoder {
     static final boolean DEBUG = false;
 
     public BasicBSONEncoder(){
-        this(UUIDRepresentation.JAVA_LEGACY);
+        this( DBEncoderDecoderOptions.getDefault() );
     }
 
-    public BasicBSONEncoder(UUIDRepresentation uuidRepresentation) {
-        this._uuidRepresentation = uuidRepresentation;
+    public BasicBSONEncoder( DBEncoderDecoderOptions options ) {
+        _options = options;
     }
 
-    public UUIDRepresentation getUuidRepresentation() {
-        return _uuidRepresentation;
+    public DBEncoderDecoderOptions getOptions() {
+        return _options;
     }
 
     public byte[] encode( BSONObject o ){
@@ -410,8 +410,8 @@ public class BasicBSONEncoder implements BSONEncoder {
     protected void putUUID( String name , UUID val ){
         _put( BINARY , name );
         _buf.writeInt( 16 );
-        _buf.write( _uuidRepresentation.getSubType() );
-        _buf.write( _uuidRepresentation.toBytes(val) );
+        _buf.write( _options.getUuidRepresentation().getSubType() );
+        _buf.write( _options.getUuidRepresentation().toBytes(val) );
     }
 
     protected void putSymbol( String name , Symbol s ){
@@ -529,5 +529,5 @@ public class BasicBSONEncoder implements BSONEncoder {
 
     protected OutputBuffer _buf;
 
-    protected final UUIDRepresentation _uuidRepresentation;
+    protected final DBEncoderDecoderOptions _options;
 }

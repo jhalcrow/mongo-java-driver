@@ -31,6 +31,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.mongodb.util.ThreadUtil;
+import org.bson.DBEncoderDecoderOptions;
 
 /**
  * represents a Port to the database, which is effectively a single connection to a server
@@ -64,7 +65,7 @@ public class DBPort {
         _hashCode = _addr.hashCode();
 
         _logger = Logger.getLogger( _rootLogger.getName() + "." + addr.toString() );
-        _decoder = _options.dbDecoderFactory.create();
+        _decoder = _options.dbDecoderFactory.create( DBEncoderDecoderOptions.getDefault() );
     }
 
     Response call( OutMessage msg , DBCollection coll ) throws IOException{
@@ -143,13 +144,13 @@ public class DBPort {
 
     synchronized private Response findOne( DB db , String coll , DBObject q ) throws IOException {
         OutMessage msg = OutMessage.query( db._mongo , 0 , db.getName() + "." + coll , 0 , -1 , q , null );
-        Response res = go( msg , db.getCollection( coll ) , DefaultDBDecoder.FACTORY.create() );
+        Response res = go( msg , db.getCollection( coll ) , DefaultDBDecoder.FACTORY.create( DBEncoderDecoderOptions.getDefault() ) );
         return res;
     }
 
     synchronized private Response findOne( String ns , DBObject q ) throws IOException{
         OutMessage msg = OutMessage.query( null , 0 , ns , 0 , -1 , q , null );
-        Response res = go( msg , null , true, null, DefaultDBDecoder.FACTORY.create()  );
+        Response res = go( msg , null , true, null, DefaultDBDecoder.FACTORY.create( DBEncoderDecoderOptions.getDefault()));
         return res;
     }
 

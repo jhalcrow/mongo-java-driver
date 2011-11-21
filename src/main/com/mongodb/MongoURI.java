@@ -172,6 +172,7 @@ public class MongoURI {
     private static Map<String, UUIDRepresentation> uriValueMap = new HashMap<String, UUIDRepresentation>();
 
     static {
+        uriValueMap.put( "unspecified", UUIDRepresentation.UNSPECIFIED );
         uriValueMap.put( "standard", UUIDRepresentation.STANDARD );
         uriValueMap.put( "javalegacy", UUIDRepresentation.JAVA_LEGACY );
         uriValueMap.put( "pythonlegacy", UUIDRepresentation.PYTHON_LEGACY );

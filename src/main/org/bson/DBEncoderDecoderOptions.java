@@ -34,6 +34,6 @@ public class DBEncoderDecoderOptions {
     private final UUIDRepresentation uuidRepresentation;
 
     public static DBEncoderDecoderOptions getDefault() {
-        return new DBEncoderDecoderOptions(UUIDRepresentation.getDefault());
+        return new DBEncoderDecoderOptions(UUIDRepresentation.UNSPECIFIED);
     }
 }

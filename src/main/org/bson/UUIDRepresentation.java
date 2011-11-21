@@ -26,6 +26,23 @@ import java.util.UUID;
  *
  */
 public enum UUIDRepresentation {
+    UNSPECIFIED {
+        @Override
+        public byte[] toBytes(UUID uuid) {
+            throw new UnsupportedOperationException( "Trying to encode a UUID when the representation is unspecified" );
+        }
+
+        @Override
+        public UUID fromBytes(byte[] bytes) {
+            throw new UnsupportedOperationException( "Trying to decode a UUID when the representation is unspecified" );
+        }
+
+        @Override
+        public int getSubType() {
+            throw new UnsupportedOperationException( "Trying to get the binary subtype for UUID when the representation is unspecified" );
+
+        }
+    },
     /**
      * Use the new standard representation for Guids (binary subtype 4 with bytes in network byte order).
      */
@@ -186,13 +203,4 @@ public enum UUIDRepresentation {
     public abstract byte[] toBytes(UUID uuid);
     public abstract UUID fromBytes(byte[] bytes);
     public abstract int getSubType();
-
-    private static UUIDRepresentation _defaultRepresentation = UUIDRepresentation.JAVA_LEGACY;
-
-    public static synchronized void setDefault( UUIDRepresentation defaultRepresentation ) {
-        _defaultRepresentation = defaultRepresentation;
-    }
-    public static synchronized UUIDRepresentation getDefault() {
-        return _defaultRepresentation;
-    }
 }

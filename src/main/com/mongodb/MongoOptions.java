@@ -48,7 +48,7 @@ public class MongoOptions {
         j = false;
         socketFactory = SocketFactory.getDefault();
         description = null;
-        uuidRepresentation = UUIDRepresentation.getDefault();
+        uuidRepresentation = UUIDRepresentation.UNSPECIFIED;
         dbDecoderFactory = new DefaultDBDecoder.DefaultFactory();
         dbEncoderFactory = new DefaultDBEncoder.DefaultFactory();
     }

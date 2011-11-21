@@ -30,6 +30,7 @@ import java.util.regex.Pattern;
 
 import org.bson.BSON;
 import org.bson.Transformer;
+import org.bson.UUIDRepresentation;
 import org.bson.types.BSONTimestamp;
 import org.bson.types.Binary;
 import org.bson.types.Code;
@@ -42,6 +43,8 @@ import org.testng.annotations.Test;
 import com.mongodb.util.JSON;
 import com.mongodb.util.TestCase;
 import com.mongodb.util.Util;
+
+import static org.testng.Assert.fail;
 
 public class JavaClientTest extends TestCase {
 
@@ -262,13 +265,34 @@ public class JavaClientTest extends TestCase {
         }
 
     }
+
     @Test
     public void testUUID()
         throws MongoException {
         DBCollection c = _db.getCollection( "testUUID" );
         c.drop();
+
+        // Ensure that if uuid representation is not specified then encoding a UUID will throw exception
+        try {
+            c.save( BasicDBObjectBuilder.start().add( "a" , new UUID(1,2)).get() );
+            fail();
+        } catch (UnsupportedOperationException e) {
+
+        }
+
+        c.setUUIDRepresentation( UUIDRepresentation.STANDARD );
         c.save( BasicDBObjectBuilder.start().add( "a" , new UUID(1,2)).add("x",5).get() );
 
+        // Ensure that if uuid representation is not specified then encoding a UUID will throw exception
+        c.setUUIDRepresentation( null );
+        try {
+            c.findOne();
+            fail();
+        } catch (UnsupportedOperationException e) {
+
+        }
+
+        c.setUUIDRepresentation( UUIDRepresentation.STANDARD );
         DBObject out = c.findOne();
         UUID b = (UUID)(out.get( "a" ) );
         assertEquals( new UUID(1,2), b);
@@ -926,6 +950,7 @@ public class JavaClientTest extends TestCase {
     public void testAllTypes(){
         DBCollection c = _db.getCollectionFromString( "foo" );
         c.drop();
+        c.setUUIDRepresentation( UUIDRepresentation.JAVA_LEGACY );
         String json = "{ 'str' : 'asdfasd' , 'long' : 5 , 'float' : 0.4 , 'bool' : false , 'date' : { '$date' : '2011-05-18T18:56:00Z'} , 'pat' : { '$regex' : '.*' , '$options' : ''} , 'oid' : { '$oid' : '4d83ab3ea39562db9c1ae2ae'} , 'ref' : { '$ref' : 'test.test' , '$id' : { '$oid' : '4d83ab59a39562db9c1ae2af'}} , 'code' : { '$code' : 'asdfdsa'} , 'codews' : { '$code' : 'ggggg' , '$scope' : { }} , 'ts' : { '$ts' : 1300474885 , '$inc' : 10} , 'null' :  null, 'uuid' : { '$uuid' : '60f65152-6d4a-4f11-9c9b-590b575da7b5' }}";
         BasicDBObject a = (BasicDBObject) JSON.parse(json);
         c.insert(a);

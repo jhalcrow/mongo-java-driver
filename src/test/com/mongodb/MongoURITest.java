@@ -110,6 +110,7 @@ public class MongoURITest extends TestCase {
         Assert.assertEquals( MongoURI._parseGuids( "javalegacy" ), UUIDRepresentation.JAVA_LEGACY );
         Assert.assertEquals( MongoURI._parseGuids( "pythonlegacy" ), UUIDRepresentation.PYTHON_LEGACY );
         Assert.assertEquals( MongoURI._parseGuids( "csharplegacy" ), UUIDRepresentation.C_SHARP_LEGACY );
+        Assert.assertEquals( MongoURI._parseGuids( "unspecified" ), UUIDRepresentation.UNSPECIFIED );
         try {
             MongoURI._parseGuids( "unknown" );
             Assert.fail();

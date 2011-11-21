@@ -50,6 +50,36 @@ public class UUIDRepresentationTest extends Assert {
     }
 
     @Test
+    public void testCSharpLegacyEncoding() {
+        UUID uuid = UUID.fromString("01020304-0506-0708-090a-0b0c0d0e0f10");
+        byte[] bytes = C_SHARP_LEGACY.toBytes(uuid);
+        byte[] expected = new byte[] { 4, 3, 2, 1, 6, 5, 8, 7, 9, 10, 11, 12, 13, 14, 15, 16 };
+        Assert.assertEquals(bytes, expected);
+    }
+
+    @Test
+    public void testCSharpLegacyDecoding() {
+        byte[] bytes = new byte[] { 4, 3, 2, 1, 6, 5, 8, 7, 9, 10, 11, 12, 13, 14, 15, 16 };
+        UUID uuid = C_SHARP_LEGACY.fromBytes(bytes);
+        UUID expected = UUID.fromString("01020304-0506-0708-090a-0b0c0d0e0f10");
+        Assert.assertEquals(uuid, expected);
+    }
+
+    @Test
+    public void testPythonLegacyEncoding() {
+        UUID uuid = UUID.fromString("01020304-0506-0708-090a-0b0c0d0e0f10");
+        byte[] bytes = PYTHON_LEGACY.toBytes(uuid);
+        Assert.assertEquals(bytes, STANDARD.toBytes( uuid ));
+    }
+
+    @Test
+    public void testPythonLegacyDecoding() {
+        byte[] bytes = new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 };
+        UUID uuid = PYTHON_LEGACY.fromBytes(bytes);
+        Assert.assertEquals(uuid, STANDARD.fromBytes( bytes ));
+    }
+
+    @Test
     public void testStandardEncoding() {
         UUID uuid = UUID.fromString("01020304-0506-0708-090a-0b0c0d0e0f10");
         byte[] bytes = STANDARD.toBytes(uuid);
@@ -64,5 +94,4 @@ public class UUIDRepresentationTest extends Assert {
         UUID expected = UUID.fromString("01020304-0506-0708-090a-0b0c0d0e0f10");
         Assert.assertEquals(uuid, expected);
     }
-
 }

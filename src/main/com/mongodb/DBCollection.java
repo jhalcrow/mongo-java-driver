@@ -269,7 +269,7 @@ public abstract class DBCollection {
     /**
      * Finds objects
      */
-    abstract Iterator<DBObject> __find( DBObject ref , DBObject fields , int numToSkip , int batchSize , int limit, int options, ReadPreference readPref, DBDecoder decoder ) throws MongoException ;
+    abstract Iterator<DBObject> __find( DBObject ref , DBObject fields , int numToSkip , int batchSize , int limit, int options, ReadPreference readPref, DBDecoder decoder, DBEncoder encoder ) throws MongoException ;
 
     /**
      * Calls {@link DBCollection#find(com.mongodb.DBObject, com.mongodb.DBObject, int, int)} and applies the query options
@@ -333,7 +333,9 @@ public abstract class DBCollection {
      */
     public final DBObject findOne( Object obj, DBObject fields ) {
         Iterator<DBObject> iterator = __find(new BasicDBObject("_id", obj), fields, 0, -1, 0, getOptions(), getReadPreference(),
-                _decoderFactory.create(new DBEncoderDecoderOptions( getUUIDRepresentation() )) );
+                _decoderFactory.create(new DBEncoderDecoderOptions( getUUIDRepresentation() )),
+                _encoderFactory.create(new DBEncoderDecoderOptions( getUUIDRepresentation() ))
+                );
         return (iterator != null ? iterator.next() : null);
     }
 
@@ -649,7 +651,8 @@ public abstract class DBCollection {
      */
     public final DBObject findOne( DBObject o, DBObject fields, ReadPreference readPref ) {
         Iterator<DBObject> i = __find( o , fields , 0 , -1 , 0, getOptions(), readPref,
-                _decoderFactory.create(new DBEncoderDecoderOptions( getUUIDRepresentation() )) );
+                _decoderFactory.create(new DBEncoderDecoderOptions( getUUIDRepresentation() )),
+                _encoderFactory.create(new DBEncoderDecoderOptions( getUUIDRepresentation() )) );
         DBObject obj = (i == null ? null : i.next());
         if ( obj != null && ( fields != null && fields.keySet().size() > 0 ) ){
             obj.markAsPartialObject();

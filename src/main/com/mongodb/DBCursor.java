@@ -67,6 +67,7 @@ public class DBCursor implements Iterator<DBObject> , Iterable<DBObject> {
         }
         _readPref = preference;
         _decoderFact = collection.getDBDecoderFactory();
+        _encoderFact = collection.getDBEncoderFactory();
     }
 
     /**
@@ -368,7 +369,8 @@ public class DBCursor implements Iterator<DBObject> , Iterable<DBObject> {
             }
 
             _it = _collection.__find( foo, _keysWanted, _skip, _batchSize, _limit , _options , _readPref ,
-                    _decoderFact.create( DBEncoderDecoderOptions.getDefault() ) );
+                    _decoderFact.create( DBEncoderDecoderOptions.getDefault() ),
+                    _encoderFact.create( DBEncoderDecoderOptions.getDefault() ) );
         }
 
         if ( _it == null ){
@@ -717,6 +719,15 @@ public class DBCursor implements Iterator<DBObject> , Iterable<DBObject> {
         return _decoderFact;
     }
 
+    public DBCursor setEncoderFactory(DBEncoderFactory fact){
+        _encoderFact = fact;
+        return this;
+    }
+
+    public DBEncoderFactory getEncoderFactory(){
+        return _encoderFact;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -758,6 +769,7 @@ public class DBCursor implements Iterator<DBObject> , Iterable<DBObject> {
     private int _options = 0;
     private ReadPreference _readPref;
     private DBDecoderFactory _decoderFact;
+    private DBEncoderFactory _encoderFact;
 
     private DBObject _specialFields;
 

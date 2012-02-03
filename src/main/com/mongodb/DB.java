@@ -160,7 +160,8 @@ public abstract class DB {
         throws MongoException {
 
         Iterator<DBObject> i = getCollection("$cmd").__find(cmd, new BasicDBObject(), 0, -1, 0, options, readPrefs ,
-                DefaultDBDecoder.FACTORY.create(new DBEncoderDecoderOptions( getUUIDRepresentation() )));
+                DefaultDBDecoder.FACTORY.create(new DBEncoderDecoderOptions( getUUIDRepresentation() )), 
+                DefaultDBEncoder.FACTORY.create(new DBEncoderDecoderOptions( getUUIDRepresentation() )));
         if ( i == null || ! i.hasNext() )
             return null;
 
@@ -284,7 +285,7 @@ public abstract class DB {
             throw new RuntimeException("this is impossible");
 
         // TODO - Is ReadPreference OK for collection Names?
-        Iterator<DBObject> i = namespaces.__find(new BasicDBObject(), null, 0, 0, 0, getOptions(), null, null);
+        Iterator<DBObject> i = namespaces.__find(new BasicDBObject(), null, 0, 0, 0, getOptions(), null, null, null);
         if (i == null)
             return new HashSet<String>();
 

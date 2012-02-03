@@ -300,6 +300,19 @@ public class JavaClientTest extends TestCase {
     }
 
     @Test
+    public void testGetByUUID()
+        throws MongoException {
+        DBCollection c = _db.getCollection( "testGetUUID" );
+        c.drop();
+
+        c.setUUIDRepresentation( UUIDRepresentation.STANDARD );
+        c.save( BasicDBObjectBuilder.start().add( "a", new UUID(1,2)).get() );
+
+        DBObject d = c.findOne( BasicDBObjectBuilder.start().add( "a", new UUID(1,2)).get() );
+        assertEquals( new UUID(1,2), (UUID)(d.get("a")) );
+    }
+
+    @Test
     public void testEval()
         throws MongoException {
         assertEquals( 17 , ((Number)(_db.eval( "return 17" ))).intValue() );

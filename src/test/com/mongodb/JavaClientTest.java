@@ -308,7 +308,11 @@ public class JavaClientTest extends TestCase {
         c.setUUIDRepresentation( UUIDRepresentation.STANDARD );
         c.save( BasicDBObjectBuilder.start().add( "a", new UUID(1,2)).get() );
 
-        DBObject d = c.findOne( BasicDBObjectBuilder.start().add( "a", new UUID(1,2)).get() );
+        DBObject d = null;
+        DBCursor cur = c.find( BasicDBObjectBuilder.start().add( "a", new UUID(1,2)).get() );
+        while(cur.hasNext()) {
+            d = cur.next();
+        }
         assertEquals( new UUID(1,2), (UUID)(d.get("a")) );
     }
 

@@ -22,6 +22,7 @@ import java.util.*;
 
 import com.mongodb.DBApiLayer.Result;
 import org.bson.DBEncoderDecoderOptions;
+import org.bson.UUIDRepresentation;
 
 
 /** An iterator over database results.
@@ -66,6 +67,9 @@ public class DBCursor implements Iterator<DBObject> , Iterable<DBObject> {
             _options = _collection.getOptions();
         }
         _readPref = preference;
+        UUIDRepresentation rep = collection.getUUIDRepresentation();
+        _dbEncDecOpts = new DBEncoderDecoderOptions(rep);
+
         _decoderFact = collection.getDBDecoderFactory();
         _encoderFact = collection.getDBEncoderFactory();
     }
@@ -369,8 +373,9 @@ public class DBCursor implements Iterator<DBObject> , Iterable<DBObject> {
             }
 
             _it = _collection.__find( foo, _keysWanted, _skip, _batchSize, _limit , _options , _readPref ,
-                    _decoderFact.create( DBEncoderDecoderOptions.getDefault() ),
-                    _encoderFact.create( DBEncoderDecoderOptions.getDefault() ) );
+                    _decoderFact.create( _dbEncDecOpts ),
+                    _encoderFact.create( _dbEncDecOpts )
+                    );
         }
 
         if ( _it == null ){
@@ -768,6 +773,7 @@ public class DBCursor implements Iterator<DBObject> , Iterable<DBObject> {
     private boolean _snapshot = false;
     private int _options = 0;
     private ReadPreference _readPref;
+    private DBEncoderDecoderOptions _dbEncDecOpts;
     private DBDecoderFactory _decoderFact;
     private DBEncoderFactory _encoderFact;
 

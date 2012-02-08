@@ -21,6 +21,8 @@ import java.util.List;
 
 import org.bson.types.*;
 import org.testng.annotations.Test;
+import org.testng.Assert;
+
 
 import com.mongodb.util.TestCase;
 
@@ -48,8 +50,22 @@ public class DBCollectionTest extends TestCase {
         c.insert(new DBObject[] {inserted1,inserted2});
     }
 
-    /*
-    TODO: fix... build is broken.
+    @Test(groups = {"basic"})
+    public void testDuplicateKeyException() {
+        DBCollection c = _db.getCollection("testDuplicateKey");
+        c.drop();
+        
+        DBObject obj = new BasicDBObject();
+        c.insert(obj, WriteConcern.SAFE);
+        try {
+           c.insert(obj, WriteConcern.SAFE);
+           Assert.fail();
+        }
+        catch (MongoException.DuplicateKey e) {
+           // Proves that a DuplicateKey exception is thrown, as test will fail if any other exception is thrown
+        }
+    }
+
     @Test(groups = {"basic"})
     public void testFindOne() {
         DBCollection c = _db.getCollection("test");
@@ -92,7 +108,6 @@ public class DBCollectionTest extends TestCase {
         assertEquals(obj.containsField("x"), false);
         assertEquals(obj.get("y"), 2);
     }
-    */
 
     /**
      * This was broken recently. Adding test.
@@ -249,19 +264,10 @@ public class DBCollectionTest extends TestCase {
         assertEquals( c.count(), 1);
     }
 
-
-    public void mongodIsVersion20Plus() {
-        String version = (String) _db.command("serverStatus").get("version");
-        System.err.println("Connected to MongoDB Version '" + version + "'");
-        assert(Double.parseDouble(version.substring(0, 3)) >= 2.0);
-    }
-
-    @Test/*(dependsOnMethods = { "mongodIsVersion20Plus" })*/
+    @Test
     public void testMultiInsertWithContinue() {
-        try {
-            mongodIsVersion20Plus();
-        } catch (Throwable t) {
-            throw new org.testng.SkipException("MongoDB 2.0 or higher is required for this test.");
+        if (!serverIsAtLeastVersion(2.0)) {
+            return;
         }
     
         DBCollection c = _db.getCollection("testmultiinsertWithContinue");
@@ -288,7 +294,6 @@ public class DBCollectionTest extends TestCase {
         DBObject obj = BasicDBObjectBuilder.start().add("x",1).add("y",2).add("foo.bar","baz").get();
         c.insert(obj);
     }
-
 
     final DB _db;
 
